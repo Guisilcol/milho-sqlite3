@@ -3,6 +3,6 @@
 /Scripts
 /Lib
 /Include
-
+/build
 /teste.*
 __pycache__
