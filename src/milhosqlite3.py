@@ -2,6 +2,7 @@ import Arguments
 import commands.Load
 import commands.Execute
 import commands.Use
+import commands.Index
 import warnings
 
 def main():
@@ -12,10 +13,12 @@ def main():
 
     if(args.command == "load"):
         commands.Load.run(args)
-    if(args.command == 'execute'):
+    elif(args.command == 'execute'):
         commands.Execute.run(args)
-    if(args.command == 'use'):
+    elif(args.command == 'use'):
         commands.Use.run(args)
+    elif(args.command == 'index'):
+        commands.Index.run(args)
     else:
         print("> Comando não implementado")
 

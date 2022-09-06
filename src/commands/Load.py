@@ -26,15 +26,16 @@ def run(arguments: Namespace):
                                     skipfooter=arguments.ignore_last_n_rows)
 
     DATAFRAME = DATAFRAME.convert_dtypes()
+    DATAFRAME = DATAFRAME.rename(columns=lambda x: x.strip())
     SQLITE3_CONNECTION = sqlite3.connect(arguments.db)
 
     #Dropar a tabela?
     if(arguments.drop_table):
-        SQLITE3_CONNECTION.execute(f"DROP TABLE {arguments.to_table};")
+        SQLITE3_CONNECTION.execute(f"DROP TABLE IF EXISTS {arguments.to_table};")
     
     #Dar truncate na tabela?
     if(arguments.truncate):
-        SQLITE3_CONNECTION.execute(f"TRUNCATE TABLE {arguments.to_table};")
+        SQLITE3_CONNECTION.execute(f"TRUNCATE TABLE IF EXISTS {arguments.to_table};")
 
     DATAFRAME.to_sql(name=arguments.to_table, con=SQLITE3_CONNECTION, index=False)
 

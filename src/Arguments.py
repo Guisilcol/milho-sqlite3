@@ -29,4 +29,9 @@ def get_arg_parse():
     export_subparser.add_argument("--from-table", help="Tabela que será exportada para arquivo", type=str)
     export_subparser.add_argument("--from-sql", help="Diretorio do arquivo SQL que será executado no banco para extrair os dados", type=pathlib.Path)
 
+    index_subparser = subparser.add_parser("index", help='Argumentos do comando "index"')
+    index_subparser.add_argument("--table", help="Tabela que será criado o index", type=str) 
+    index_subparser.add_argument("--index", help="Nome do index que será criado", type=str) 
+    index_subparser.add_argument("--cols", help="Nome das colunas que serão usadas no index. Ex: 'coluna1,coluna4'", type=str, default=None)
+
     return parser
