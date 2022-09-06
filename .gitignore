@@ -1,0 +1,8 @@
+# created by virtualenv automatically
+/output/index
+/Scripts
+/Lib
+/Include
+
+/teste.*
+__pycache__
