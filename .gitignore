@@ -1,6 +1,7 @@
 # created by virtualenv automatically
 /output/index
-/Scripts
+/Scripts/*
+!/Scripts/_**.bat
 /Lib
 /Include
 /build
