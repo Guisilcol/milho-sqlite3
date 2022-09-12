@@ -1,0 +1,1 @@
+pyinstaller src/milhosqlite3.py --onefile --hidden-import openpyxl
