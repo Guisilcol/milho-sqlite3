@@ -3,13 +3,14 @@ import commands.Load
 import commands.Execute
 import commands.Use
 import commands.Index
-import warnings
+import commands.Export
+from warnings import filterwarnings
 
 def main():
     args = Arguments.get_arg_parse().parse_args()
     
     if not args.is_dev:
-        warnings.filterwarnings("ignore")
+        filterwarnings("ignore")
 
     if(args.command == "load"):
         commands.Load.run(args)
@@ -19,6 +20,8 @@ def main():
         commands.Use.run(args)
     elif(args.command == 'index'):
         commands.Index.run(args)
+    elif(args.command == 'export'):
+        commands.Export.run(args)
     else:
         print("> Comando não implementado")
 
