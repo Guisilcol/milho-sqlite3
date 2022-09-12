@@ -14,16 +14,16 @@ def main():
 
     if(args.command == "load"):
         commands.Load.run(args)
-    elif(args.command == 'execute'):
+    elif(args.command == "execute"):
         commands.Execute.run(args)
-    elif(args.command == 'use'):
+    elif(args.command == "use"):
         commands.Use.run(args)
-    elif(args.command == 'index'):
+    elif(args.command == "index"):
         commands.Index.run(args)
-    elif(args.command == 'export'):
+    elif(args.command == "export"):
         commands.Export.run(args)
     else:
         print("> Comando não implementado")
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

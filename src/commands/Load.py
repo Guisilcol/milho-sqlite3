@@ -2,7 +2,7 @@ from pandas import (read_excel,
                     read_fwf,
                     read_csv)
 from argparse import Namespace
-import sqlite3
+from sqlite3 import connect
 
 
 def run(arguments: Namespace):
@@ -32,9 +32,9 @@ def run(arguments: Namespace):
 
     dataframe = (dataframe
                  .convert_dtypes()
-                 .rename(columns=lambda x: x.strip()))
+                 .rename(columns = lambda x: x.strip()))
 
-    SQLITE3_CONNECTION = sqlite3.connect(arguments.db)
+    SQLITE3_CONNECTION = connect(arguments.db)
 
     #Dropar a tabela?
     if (arguments.drop_table):
