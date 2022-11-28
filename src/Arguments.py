@@ -10,9 +10,11 @@ def get_arg_parse():
     parser.add_argument("--is-dev", help="Arquivo de banco de dados que será usado",
                         action=BooleanOptionalAction, type=bool, default=False)
 
-    # EXECUTE
-    execute_subparser = subparser.add_parser(
+    # USE
+    use_subparser = subparser.add_parser(
         "use", help='Argumentos do comando "use"')
+    
+    # EXECUTE
     execute_subparser = subparser.add_parser(
         "execute", help='Argumentos do comando "execute"')
     execute_subparser.add_argument(
@@ -69,4 +71,4 @@ def get_arg_parse():
     index_subparser.add_argument(
         "--cols", help="Nome das colunas que serão usadas no index. Ex: 'coluna1,coluna4'", type=str, default=None)
 
-    return parser
+    return parser.parse_known_args()[0].__dict__
