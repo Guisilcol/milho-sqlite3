@@ -6,7 +6,7 @@ def get_arg_parse():
     parser = ArgumentParser(description="Utilitário para usar SQLITE3")
     subparser = parser.add_subparsers(dest='command')
     parser.add_argument(
-        "db", help="Arquivo de banco de dados que será usado", type=Path)
+        "db", help="Arquivo de banco de dados que será usado", type=Path, default='./generated_database.sqlite3')
     parser.add_argument("--is-dev", help="Arquivo de banco de dados que será usado",
                         action=BooleanOptionalAction, type=bool, default=False)
 
@@ -70,5 +70,18 @@ def get_arg_parse():
         "--index", help="Nome do index que será criado", type=str)
     index_subparser.add_argument(
         "--cols", help="Nome das colunas que serão usadas no index. Ex: 'coluna1,coluna4'", type=str, default=None)
+
+    #FIXED COLS WIDTH 
+    fixed_cols_width_subparser = subparser.add_parser(
+        "fixedcolswidth", help='Argumentos do comando "fixedcolswidth"')
+    fixed_cols_width_subparser.add_argument(
+        "--file", help="Arquivo que será usado para calcular o comprimento das colunas", type=Path)
+    fixed_cols_width_subparser.add_argument(
+        "--row-number", help="Número da linha que será usada para calcular o comprimento das colunas", type=int, default=0)
+    fixed_cols_width_subparser.add_argument(
+        "--separator", help="Separador dos delimitadores de coluna", type=str, default=" ")
+    fixed_cols_width_subparser.add_argument(
+        "--count-separators", help="Flag para contar o separador como parte do comprimento da coluna", action=BooleanOptionalAction, type=bool, default=True)
+
 
     return parser.parse_known_args()[0].__dict__

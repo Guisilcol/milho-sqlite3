@@ -3,7 +3,7 @@ from tabulate import tabulate
 from dataclasses import dataclass, fields
 
 @dataclass(init=False)
-class ExecuteCommandArgs:
+class ExecuteArgs:
     db: str
     statement: str
     from_file: str = '.' # valor padrão no arquivo arguments.py
@@ -21,7 +21,7 @@ class Execute:
         raise NotImplementedError()
         
     @staticmethod
-    def run(arguments: ExecuteCommandArgs):
+    def run(arguments: ExecuteArgs):
         CONNECTION = connect(arguments.db)
         statement = None
         if not str(arguments.from_file) == '.':

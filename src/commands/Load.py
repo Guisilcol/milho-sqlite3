@@ -6,7 +6,7 @@ from dataclasses import dataclass, fields
 import typing as types
 
 @dataclass(init=False)
-class LoadCommandArgs:
+class LoadArgs:
     db: str
     to_table: str
     from_file: str
@@ -30,7 +30,7 @@ class Load:
         raise NotImplementedError()
 
     @staticmethod
-    def run(arguments: LoadCommandArgs):
+    def run(arguments: LoadArgs):
         dataframe = None
 
         if arguments.file_type == "excel":

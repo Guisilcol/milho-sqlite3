@@ -2,7 +2,7 @@ from sqlite3 import connect
 from dataclasses import dataclass, fields
 
 @dataclass(init=False)
-class IndexCommandArgs:
+class IndexArgs:
     db: str
     table: str
     index: str
@@ -20,7 +20,7 @@ class Index:
         raise NotImplementedError()
 
     @staticmethod
-    def run(arguments: IndexCommandArgs):
+    def run(arguments: IndexArgs):
         CONNECTION = connect(arguments.db)
         table_name = arguments.table
         index_name = arguments.index

@@ -1,9 +1,8 @@
-# created by virtualenv automatically
 /output/index
-/Scripts/*
-!/Scripts/_**
 /Lib
 /Include
 /build
 /teste.*
 __pycache__
+milhosqlite3.spec
+

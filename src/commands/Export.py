@@ -4,7 +4,7 @@ from dataclasses import dataclass, fields
 import typing as types
 
 @dataclass(init=False)
-class ExportCommandArgs:
+class ExportArgs:
     db: str
     statement: str
     to_file: str
@@ -25,7 +25,7 @@ class Export:
         raise NotImplementedError()
 
     @staticmethod
-    def run(arguments: ExportCommandArgs):
+    def run(arguments: ExportArgs):
         CONNECTION = connect(arguments.db)
         STATEMENT = None
         if not str(arguments.sql_file) == '.':

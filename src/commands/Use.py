@@ -3,7 +3,7 @@ from tabulate import tabulate
 from dataclasses import dataclass, fields
 
 @dataclass(init=False)
-class UseCommandArgs:
+class UseArgs:
     db: str
     
     def __init__(self, **kwargs):
@@ -19,7 +19,7 @@ class Use:
         raise NotImplementedError()
 
     @staticmethod
-    def run(arguments: UseCommandArgs):
+    def run(arguments: UseArgs):
         CONNECTION = connect(arguments.db)
 
         while (True):
