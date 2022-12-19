@@ -16,10 +16,6 @@ class ExecuteArgs:
 
                 
 class Execute: 
-    
-    def __init__(self) -> None:
-        raise NotImplementedError()
-        
     @staticmethod
     def run(arguments: ExecuteArgs):
         CONNECTION = connect(arguments.db)

@@ -20,10 +20,6 @@ class ExportArgs:
 
 
 class Export:
-
-    def __init__(self) -> None:
-        raise NotImplementedError()
-
     @staticmethod
     def run(arguments: ExportArgs):
         CONNECTION = connect(arguments.db)

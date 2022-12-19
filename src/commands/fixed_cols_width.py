@@ -14,9 +14,6 @@ class FixedColsWidthArgs:
                 setattr(self, key, value)
 
 class FixedColsWidth:
-    def __init__(self):
-        raise NotImplementedError()
-
     @staticmethod
     def run(arguments: FixedColsWidthArgs):
         with open(arguments.file, 'r') as file:

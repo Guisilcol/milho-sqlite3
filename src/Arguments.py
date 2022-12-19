@@ -5,14 +5,14 @@ from pathlib import Path
 def get_arg_parse():
     parser = ArgumentParser(description="Utilitário para usar SQLITE3")
     subparser = parser.add_subparsers(dest='command')
-    parser.add_argument(
-        "db", help="Arquivo de banco de dados que será usado", type=Path, default='./generated_database.sqlite3')
     parser.add_argument("--is-dev", help="Arquivo de banco de dados que será usado",
                         action=BooleanOptionalAction, type=bool, default=False)
 
     # USE
     use_subparser = subparser.add_parser(
         "use", help='Argumentos do comando "use"')
+    use_subparser.add_argument(
+        "--db", help="Arquivo de banco de dados que será usado", type=Path, default='./generated_database.sqlite3')
     
     # EXECUTE
     execute_subparser = subparser.add_parser(
@@ -21,6 +21,8 @@ def get_arg_parse():
         "--from-file", help="Executar o conteudo do arquivo especificado no banco de dados", type=Path, default='')
     execute_subparser.add_argument(
         "--statement", help="Comando SQL que será executado no banco de dados", type=str, default='')
+    execute_subparser.add_argument(
+        "--db", help="Arquivo de banco de dados que será usado", type=Path, default='./generated_database.sqlite3')
 
     # LOAD
     load_subparser = subparser.add_parser(
@@ -30,9 +32,7 @@ def get_arg_parse():
     load_subparser.add_argument(
         "--file-type", help="Extensão do arquivo que será carregado", type=str, choices=['csv', 'excel', 'fixed'])
     load_subparser.add_argument(
-        "--delimiter", help="Delimitador do arquivo CSV", type=str)
-    load_subparser.add_argument(
-        "--cols-width", help="Comprimento das colunas do arquivo tabular (fixed). Ex: '1,7,23,5,1'", type=str, default="1,1")
+        "--delimiter-or-cols-width", help="Delimitador do arquivo CSV ou o comprimento das colunas quando o arquivo é tabular (fixed)", type=str)
     load_subparser.add_argument(
         "--to-table", help="Tabela que será exportada para arquivo", type=str)
     load_subparser.add_argument("--truncate", help="Flag de truncate na tabela",
@@ -45,6 +45,17 @@ def get_arg_parse():
         "--ignore-first-n-rows", help="Ignorar as primeiras N linhas do arquivo", type=int, default=0)
     load_subparser.add_argument(
         "--ignore-last-n-rows", help="Ignorar as ultimas N linhas do arquivo", type=int, default=0)
+    load_subparser.add_argument(
+        "--db", help="Arquivo de banco de dados que será usado", type=Path, default='./generated_database.sqlite3')
+
+    # LOAD V2
+    load_subparser = subparser.add_parser(
+        "loadv2", help='Argumentos do comando "load"')
+    load_subparser.add_argument(
+        "--from-file", help="Diretorio do arquivo CSV que será carregado", type=Path)
+    load_subparser.add_argument(
+        "--db", help="Arquivo de banco de dados que será usado", type=Path, default='./generated_database.sqlite3')
+
 
     #EXPORT
     export_subparser = subparser.add_parser(
@@ -60,6 +71,8 @@ def get_arg_parse():
                                   choices=['excel', 'csv'])
     export_subparser.add_argument(
         "--delimiter", help="Delimitador do arquivo csv", type=str)
+    export_subparser.add_argument(
+        "--db", help="Arquivo de banco de dados que será usado", type=Path, default='./generated_database.sqlite3')
 
     #INDEX
     index_subparser = subparser.add_parser(
@@ -70,6 +83,8 @@ def get_arg_parse():
         "--index", help="Nome do index que será criado", type=str)
     index_subparser.add_argument(
         "--cols", help="Nome das colunas que serão usadas no index. Ex: 'coluna1,coluna4'", type=str, default=None)
+    index_subparser.add_argument(
+        "--db", help="Arquivo de banco de dados que será usado", type=Path, default='./generated_database.sqlite3')
 
     #FIXED COLS WIDTH 
     fixed_cols_width_subparser = subparser.add_parser(
@@ -82,6 +97,8 @@ def get_arg_parse():
         "--separator", help="Separador dos delimitadores de coluna", type=str, default=" ")
     fixed_cols_width_subparser.add_argument(
         "--count-separators", help="Flag para contar o separador como parte do comprimento da coluna", action=BooleanOptionalAction, type=bool, default=True)
+    fixed_cols_width_subparser.add_argument(
+        "--db", help="Arquivo de banco de dados que será usado", type=Path, default='./generated_database.sqlite3')
 
 
     return parser.parse_known_args()[0].__dict__

@@ -14,10 +14,6 @@ class UseArgs:
 
 
 class Use:
-    
-    def __init__(self) -> None:
-        raise NotImplementedError()
-
     @staticmethod
     def run(arguments: UseArgs):
         CONNECTION = connect(arguments.db)
@@ -27,12 +23,12 @@ class Use:
                 cursor = None
                 command = input("milho-sqlite3: ").strip()
 
-                if (command.startswith('.exit')):
+                if command.startswith('.exit'):
                     break
-                elif (command.startswith('.tables')):
+                elif command.startswith('.tables'):
                     command = "SELECT name FROM sqlite_master WHERE type='table';"
 
-                elif (command.startswith(".desc")):
+                elif command.startswith(".desc"):
                     table = command[6:]
                     command = f"PRAGMA table_info('{table}');"
 
@@ -41,9 +37,7 @@ class Use:
                 if cursor.description != None:
                     data = cursor.fetchall()
                     headers = [tup[0] for tup in cursor.description]
-                    print()
-                    print(tabulate(data, headers=headers))
-                    print()
+                    print('\n', tabulate(data, headers=headers), '\n')
             except KeyboardInterrupt:
                 break
             except Exception as error:
