@@ -35,8 +35,8 @@ class LoadV2:
             have_header = 0 if arguments.header else None
             dataframe = read_excel(arguments.from_file,
                                     header=have_header,
-                                    skiprows=arguments.ignore_first_n_rows,
-                                    skipfooter=arguments.ignore_last_n_rows)
+                                    skiprows=int(arguments.ignore_first_n_rows),
+                                    skipfooter=int(arguments.ignore_last_n_rows))
 
         elif arguments.file_type == 'fixed':
             cols_width = str(arguments.delimiter_or_cols_width).split(",")
