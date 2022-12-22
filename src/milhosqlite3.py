@@ -30,8 +30,8 @@ class Main():
                 commands.Index.run(commands.IndexArgs(**dict(args)))
             elif(command == "export"):
                 commands.Export.run(commands.ExportArgs(**dict(args)))
-            elif(command == "fixedcolswidth"):
-                commands.FixedColsWidth.run(commands.FixedColsWidthArgs(**dict(args)))
+            elif(command == "layout"):
+                commands.FixedColsWidth.run(dict(args))
             elif(command == "loadv2"):
                 commands.LoadV2.run(dict(args))
             else:

@@ -87,18 +87,9 @@ def get_arg_parse():
         "--db", help="Arquivo de banco de dados que será usado", type=Path, default='./generated_database.sqlite3')
 
     #FIXED COLS WIDTH 
-    fixed_cols_width_subparser = subparser.add_parser(
-        "fixedcolswidth", help='Argumentos do comando "fixedcolswidth"')
-    fixed_cols_width_subparser.add_argument(
-        "--file", help="Arquivo que será usado para calcular o comprimento das colunas", type=Path)
-    fixed_cols_width_subparser.add_argument(
-        "--row-number", help="Número da linha que será usada para calcular o comprimento das colunas", type=int, default=0)
-    fixed_cols_width_subparser.add_argument(
-        "--separator", help="Separador dos delimitadores de coluna", type=str, default=" ")
-    fixed_cols_width_subparser.add_argument(
-        "--count-separators", help="Flag para contar o separador como parte do comprimento da coluna", action=BooleanOptionalAction, type=bool, default=True)
-    fixed_cols_width_subparser.add_argument(
-        "--db", help="Arquivo de banco de dados que será usado", type=Path, default='./generated_database.sqlite3')
-
+    layout_subparser = subparser.add_parser(
+        "layout", help='Argumentos do comando "layout"')
+    layout_subparser.add_argument(
+        "--layout", help="Layout das colunas separado por espaços. Os espaços são contabilizados como parte do layout (com exceção da última coluna). Ex: input -> '***** ** *** ****' -> '7, 3, 4, 4'", type=str, default="")
 
     return parser.parse_known_args()[0].__dict__

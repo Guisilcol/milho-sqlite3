@@ -2,10 +2,7 @@ from dataclasses import dataclass, fields
 
 @dataclass(init=False)
 class FixedColsWidthArgs:
-    file: str
-    row_number: int
-    separator: str
-    count_separators: bool
+    layout: str 
 
     def __init__(self, **kwargs):
         fields_name = set([field.name for field in fields(self)])
@@ -15,25 +12,26 @@ class FixedColsWidthArgs:
 
 class FixedColsWidth:
     @staticmethod
-    def run(arguments: FixedColsWidthArgs):
-        with open(arguments.file, 'r') as file:
-            line = file.readlines()[arguments.row_number]
+    def run(arguments: dict):
+        args = FixedColsWidthArgs(**arguments)
+        each_col_layout = args.layout.split(' ')
+        
+        normalized_col_layout = []
+        
+        for index, col_layout in enumerate(each_col_layout):
+            if index == len(each_col_layout) - 1:
+                normalized_col_layout.append(col_layout)
+                continue 
             
-            cols_width = []
-            if arguments.count_separators:
-                delimiters_without_separator = line.split(arguments.separator)
-                cols_quantity = len(delimiters_without_separator)
+            normalized_col_layout.append(col_layout + ' ')
 
-                for index, delimiter in enumerate(delimiters_without_separator):
-                    if index == cols_quantity - 1:
-                        cols_width.append(len(delimiter) - 1)
-                    else:
-                        cols_width.append(len(delimiter) + 1)
-            
-            else:
-                cols_width = [len(col) for col in line.split(arguments.separator)]
+        col_len = [str(len(col)) for col in normalized_col_layout]
+        col_layout = ','.join(col_len)
+        print(col_layout)
 
-            print(",".join([str(width) for width in cols_width]))
+        
+
+        
 
 
             

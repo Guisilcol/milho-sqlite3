@@ -28,7 +28,6 @@ class LoadV2:
     @staticmethod
     def run(args: dict):
         arguments = LoadV2.__get_arguments(args)
-        print(arguments)
         dataframe = None
 
         if arguments.file_type == "excel":
@@ -86,7 +85,6 @@ class LoadV2:
             inq.List("file_type", message="Tipo do arquivo",
                         choices=["excel", "csv", "fixed"]),
             inq.Text("delimiter_or_cols_width", message="Delimitador (CSV) ou tamanho das colunas do arquivo (FIXED). (Ignorar caso o arquivo seja Excel)"),
-
             inq.Confirm("drop_table", message="Deseja dropar a tabela?", default=False),
             inq.Confirm("truncate", message="Deseja truncar a tabela?", default=False),
             inq.Confirm("header", message="O arquivo possui cabeçalho?", default=True),
