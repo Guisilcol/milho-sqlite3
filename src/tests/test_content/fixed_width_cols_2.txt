@@ -1,8 +1,0 @@
-nome    id     sobrenome
-******* ****** ****************
-milho   123    milhacaviadoaasd
-guiguiss302332 roshdanado  
-kenedovi3330012desgraca    
-milho   123    milhacaviado
-guiguiss302332 roshdanado  
-kenedovi3330012desgraca   

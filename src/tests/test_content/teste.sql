@@ -1,1 +1,0 @@
-select * from tTeste limit 100

@@ -1,16 +1,18 @@
 from pandas import (read_excel,
                     read_fwf,
-                    read_csv)
+                    read_csv,
+                    read_json)
 from sqlite3 import connect
-from dataclasses import dataclass, fields
+from dataclasses import dataclass
 import typing as types
-import inquirer as inq
+from pathlib import Path
+from util import TerminalQuiz as tq, DynamicDataclass, ApplicationFlow as af, Config
 
 @dataclass(init=False)
-class LoadV2Args:
+class LoadV2Args(DynamicDataclass):
     db: str
     to_table: str
-    from_file: str
+    from_file: Path
     file_type: types.Literal['excel', 'csv', 'fixed']
     delimiter_or_cols_width: str
     drop_table: bool = False # valor padrão no arquivo arguments.py
@@ -20,80 +22,105 @@ class LoadV2Args:
     ignore_last_n_rows: int = 0 # valor padrão no arquivo arguments.py
 
     def __init__(self, **kwargs):
-        fields_name = set([field.name for field in fields(self)])
-        for key, value in kwargs.items():
-            if key in fields_name:
-                setattr(self, key, value)
+        super().__init__(**kwargs)
+
 class LoadV2:
+    def __init__(self):
+        raise NotImplementedError("This class cannot be instantiated")
+        
     @staticmethod
-    def run(args: dict):
-        arguments = LoadV2.__get_arguments(args)
-        dataframe = None
+    def run(args: dict, interactive_mode: bool = False):
+        """Executa o comando load_v2. Comando responsável por carregar dados de um arquivo para uma tabela do banco de dados informando os parâmetros de forma interativa no terminal.
 
-        if arguments.file_type == "excel":
-            have_header = 0 if arguments.header else None
-            dataframe = read_excel(arguments.from_file,
-                                    header=have_header,
-                                    skiprows=int(arguments.ignore_first_n_rows),
-                                    skipfooter=int(arguments.ignore_last_n_rows))
+        Args:
+            args (dict): Argumentos de linha de comando inseridos pelo usuário.
+        """        
+        try:
+            arguments = LoadV2.__show_terminal_quiz(args)
+            dataframe = None
+            match arguments.file_type:
+                case "excel":
+                    dataframe = LoadV2.__excel_file_to_dataframe(arguments)
+                
+                case "fixed":
+                    dataframe = LoadV2.__fixed_file_to_dataframe(arguments)
 
-        elif arguments.file_type == 'fixed':
-            cols_width = str(arguments.delimiter_or_cols_width).split(",")
-            cols_width = [int(width) for width in cols_width]
-            dataframe = read_fwf(arguments.from_file,
-                                    widths=cols_width)
+                case "json":
+                    dataframe = LoadV2.__json_file_to_dataframe(arguments)
 
-        else:
-            have_header = 0 if arguments.header else None
-            dataframe = read_csv(arguments.from_file,
-                                    delimiter=arguments.delimiter_or_cols_width,
-                                    header=have_header,
-                                    skiprows=int(arguments.ignore_first_n_rows),
-                                    skipfooter=int(arguments.ignore_last_n_rows))
+                case "csv":
+                    dataframe = LoadV2.__csv_file_to_dataframe(arguments)
 
-        dataframe = (dataframe
-                    .convert_dtypes()
-                    .rename(columns = lambda x: str(x).strip()))
 
-        SQLITE3_CONNECTION = connect(arguments.db)
+            dataframe = dataframe.convert_dtypes().rename(columns = lambda x: str(x).strip())
 
-        #Dropar a tabela?
-        if (arguments.drop_table):
-            SQLITE3_CONNECTION.execute(
-                f"DROP TABLE IF EXISTS {arguments.to_table};")
+            SQLITE3_CONNECTION = connect(arguments.db)
 
-        #Dar truncate na tabela?
-        if (arguments.truncate):
-            SQLITE3_CONNECTION.execute(
-                f"DELETE FROM {arguments.to_table};")
+            #Dropar a tabela?
+            if (arguments.drop_table):
+                SQLITE3_CONNECTION.execute(f"DROP TABLE {arguments.to_table};")
+                SQLITE3_CONNECTION.commit()
 
-        dataframe.to_sql(name=arguments.to_table,
-                        con=SQLITE3_CONNECTION,
-                        if_exists='append',
-                        index=False)
+            #Dar truncate na tabela?
+            if (arguments.truncate):
+                SQLITE3_CONNECTION.execute(f"DELETE FROM {arguments.to_table};")
+                SQLITE3_CONNECTION.commit()
+
+            dataframe.to_sql(name=arguments.to_table, con=SQLITE3_CONNECTION, if_exists='append', index=False)
+            SQLITE3_CONNECTION.close()
+
+        except KeyboardInterrupt:
+            af.print_returning_to_menu()
 
     @staticmethod
-    def __get_arguments(parsed_args: dict):
-        args = {}
-        args.update({
-            "db": parsed_args.get("db"), 
-            "from_file": parsed_args.get('from_file')
-        })
+    def __show_terminal_quiz(config: Config) -> LoadV2Args:
+        """Cria um quiz no terminal para o usuário preencher os argumentos do comando.
 
-        questions = [
-            inq.Text("to_table", message="Nome da tabela"),
-            inq.List("file_type", message="Tipo do arquivo",
-                        choices=["excel", "csv", "fixed"]),
-            inq.Text("delimiter_or_cols_width", message="Delimitador (CSV) ou tamanho das colunas do arquivo (FIXED). (Ignorar caso o arquivo seja Excel)"),
-            inq.Confirm("drop_table", message="Deseja dropar a tabela?", default=False),
-            inq.Confirm("truncate", message="Deseja truncar a tabela?", default=False),
-            inq.Confirm("header", message="O arquivo possui cabeçalho?", default=True),
-            inq.Text("ignore_first_n_rows", message="Quantas linhas ignorar no início do arquivo?", default='0'),
-            inq.Text("ignore_last_n_rows", message="Quantas linhas ignorar no final do arquivo?", default='0')
-        ]
+        Args:
+                args (dict): Argumentos informados na inicialização do programa. Precisa conter os argumentos "db" e "from_file".
 
-        answers = inq.prompt(questions)
-        args.update(answers)
-        return LoadV2Args(**args)
+        Returns:
+            LoadV2Args: Argumentos que serão utilizados no comando.
+        """        
+
+        db = config.current_db_filepath
+        from_file = tq.ask_for_string("Filepath of file to load", "")
+        to_table = tq.ask_for_string("Table name", "")
+        file_type = tq.ask_for_list("Filetype", ["excel", "csv", "fixed", "json"], "excel")
+        
+        delimiter_or_cols_width = None if file_type not in ["csv", "fixed"]\
+            else tq.ask_for_string("Delimiter (CSV file) or columns Width (Fixed file)", "")
+        
+        drop_table = tq.ask_yes_or_no("Drop table?", False)
+        truncate = tq.ask_yes_or_no("Truncate table?", False)
+        header = tq.ask_yes_or_no("File have header?", True)
+        ignore_first_n_rows = tq.ask_for_integer("How many lines to ignore at the beginning of the file?", 0)
+        ignore_last_n_rows = tq.ask_for_integer("How many lines to ignore at the end of the file?", 0)
+
+        return LoadV2Args(db=db, from_file=from_file, to_table=to_table, file_type=file_type, delimiter_or_cols_width=delimiter_or_cols_width, 
+                    drop_table=drop_table, truncate=truncate, header=header, ignore_first_n_rows=ignore_first_n_rows, ignore_last_n_rows=ignore_last_n_rows)
+
+    @staticmethod
+    def __csv_file_to_dataframe(arguments: LoadV2Args):
+        have_header = 0 if arguments.header else None
+        return read_csv(arguments.from_file, delimiter=arguments.delimiter_or_cols_width, header=have_header,
+                                skiprows=int(arguments.ignore_first_n_rows), skipfooter=int(arguments.ignore_last_n_rows))
+
+    @staticmethod
+    def __excel_file_to_dataframe(arguments: LoadV2Args):
+        have_header = 0 if arguments.header else None
+        return read_excel(arguments.from_file, header=have_header, skiprows=int(arguments.ignore_first_n_rows), 
+                                skipfooter=int(arguments.ignore_last_n_rows))
+
+    @staticmethod
+    def __fixed_file_to_dataframe(arguments: LoadV2Args):
+        cols_width = str(arguments.delimiter_or_cols_width).split(",")
+        cols_width = [int(width) for width in cols_width]
+        return read_fwf(arguments.from_file, widths=cols_width)
+
+    @staticmethod
+    def __json_file_to_dataframe(arguments: LoadV2Args):
+        return read_json(arguments.from_file)
+
 
         
